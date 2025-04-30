@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Polling Chat App</title>
+  <style>
+    body { font-family: Arial; }
+    #messages { border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: scroll; margin-bottom: 10px; }
+    input, button { padding: 5px; }
+  </style>
+</head>
+<body>
+  <h2>Simple Polling Chat App</h2>
+  <div id="messages"></div>
+  <input id="username" placeholder="Username" />
+  <input id="message" placeholder="Type a message..." />
+  <button onclick="sendMessage()">Send</button>
+
+  <script>
+    async function fetchMessages() {
+      const res = await fetch('http://localhost:3000/messages');
+      const msgs = await res.json();
+      const msgDiv = document.getElementById('messages');
+      msgDiv.innerHTML = msgs.map(m => `<p><b>${m.username}:</b> ${m.message}</p>`).join('');
+    }
+
+    async function sendMessage() {
+      const username = document.getElementById('username').value;
+      const message = document.getElementById('message').value;
+      await fetch('http://localhost:3000/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, message })
+      });
+      document.getElementById('message').value = '';
+    }
+
+    // Poll every 2 seconds
+    setInterval(fetchMessages, 2000);
+    fetchMessages(); // Initial load
+  </script>
+</body>
+</html>
